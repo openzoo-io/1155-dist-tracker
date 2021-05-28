@@ -6,6 +6,7 @@ const ethers = require('ethers')
 const mongoose = require('mongoose')
 const ERC1155CONTRACT = mongoose.model('ERC1155CONTRACT')
 const ERC1155TOKEN = mongoose.model('ERC1155TOKEN')
+const ERC1155HOLDING = mongoose.model('ERC1155HOLDING')
 
 const SimplifiedERC1155ABI = require('../constants/simplified1155abi')
 
@@ -232,7 +233,24 @@ const analyzeEvents = async (address, contract) => {
       }
       savingTk.name = name
       savingTk.symbol = 'symbol'
-      savingTk.owner = ownerMap
+      // save the erc1155 holdings instead here
+
+      let holderAddresses = ownerMap.keys()
+      let holderAddress = holderAddresses.next().value
+      while (holderAddress) {
+        let supplyPerHolder = parseInt(ownerMap.get(holderAddress))
+        let erc1155holdings = new ERC1155HOLDING()
+        erc1155holdings.contractAddress = address
+        erc1155holdings.tokenID = tkID
+        erc1155holdings.holderAddress = holderAddress
+        erc1155holdings.supplyPerHolder = supplyPerHolder
+        try {
+          await erc1155holdings.save()
+        } catch (error) {
+        } finally {
+          holderAddress = holderAddresses.next().value
+        }
+      }
 
       let blockNumber = blockNumbersMap.get(address + '-' + tkID)
       let block = await provider.getBlock(blockNumber)
