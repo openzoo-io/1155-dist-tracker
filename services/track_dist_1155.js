@@ -41,7 +41,6 @@ const parseBatchTransferData = (data) => {
     let tokenID = parseInt(_tkData.toString(), 16)
     tokenIDs.push(tokenID)
   }
-
   return tokenIDs
 }
 
@@ -112,19 +111,26 @@ const analyzeEvents = async (address, contract) => {
     let uriEvt = urie[i]
     let stTopics = singleTransferEvt.topics
     let stData = singleTransferEvt.data
-    let uriData = uriEvt.data
+    let uriData = null
+    try {
+      uriData = uriEvt.data
+    } catch (error) {}
+
     let sender = extractAddress(stTopics[2])
     sender = toLowerCase(sender)
     let receiver = extractAddress(stTopics[3])
     receiver = toLowerCase(receiver)
 
-    let contractAddress = toLowerCase(uriEvt.address)
-    let blockNumber = parseInt(uriEvt.blockNumber)
+    let contractAddress = toLowerCase(singleTransferEvt.address)
+    let blockNumber = parseInt(singleTransferEvt.blockNumber)
 
     stData = parseSingleTrasferData(stData)
     let tokenID = stData[0]
     let supply = stData[1]
-    let tokenURI = parseURIHexToString(uriData)
+    let tokenURI = 'https"//'
+    try {
+      tokenURI = parseURIHexToString(uriData)
+    } catch (error) {}
 
     // when this is a mint evt, log total supply & token uri
     if (sender == validatorAddress) {
@@ -271,7 +277,6 @@ const analyzeEvents = async (address, contract) => {
 const track1155Distribution = async () => {
   //track 1155 dist
   const func = async () => {
-    console.log('func called')
     try {
       let untrackedSCs = await ERC1155CONTRACT.find({
         address: { $nin: trackedAddresses },
