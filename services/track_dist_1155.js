@@ -251,6 +251,7 @@ const analyzeEvents = async (address, contract) => {
         erc1155holdings.holderAddress = holderAddress
         erc1155holdings.supplyPerHolder = supplyPerHolder
         try {
+          if(supplyPerHolder > 0)
           await erc1155holdings.save()
         } catch (error) {
         } finally {
