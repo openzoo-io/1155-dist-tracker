@@ -5,7 +5,7 @@ const axios = require('axios')
 const ethers = require('ethers')
 const mongoose = require('mongoose')
 const ERC1155CONTRACT = mongoose.model('ERC1155CONTRACT')
-const ERC1155TOKEN = mongoose.model('ERC1155TOKEN')
+const NFTITEM = mongoose.model('NFTITEM')
 const ERC1155HOLDING = mongoose.model('ERC1155HOLDING')
 
 const SimplifiedERC1155ABI = require('../constants/simplified1155abi')
@@ -189,7 +189,7 @@ const analyzeEvents = async (address, contract) => {
   let tkID = tkIDs.next().value
   while (tkID) {
     let holderAddrs = holders.get(tkID)
-    let _savedTk = await ERC1155TOKEN.findOne({
+    let _savedTk = await NFTITEM.findOne({
       contractAddress: address,
       tokenID: tkID,
     })
@@ -224,11 +224,12 @@ const analyzeEvents = async (address, contract) => {
         ownerMap.set(holderAddr, supply)
       })
       await Promise.all(promise)
-      let savingTk = new ERC1155TOKEN()
+      let savingTk = new NFTITEM()
       savingTk.contractAddress = address
       savingTk.tokenID = tkID
       let uri = tokenUris.get(tkID)
       savingTk.tokenURI = uri
+      savingTk.tokenType = 1155
       let name = ''
       try {
         let metadata = await axios.get(uri)
@@ -251,8 +252,7 @@ const analyzeEvents = async (address, contract) => {
         erc1155holdings.holderAddress = holderAddress
         erc1155holdings.supplyPerHolder = supplyPerHolder
         try {
-          if(supplyPerHolder > 0)
-          await erc1155holdings.save()
+          if (supplyPerHolder > 0) await erc1155holdings.save()
         } catch (error) {
         } finally {
           holderAddress = holderAddresses.next().value
