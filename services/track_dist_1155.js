@@ -231,14 +231,17 @@ const analyzeEvents = async (address, contract) => {
       savingTk.tokenURI = uri
       savingTk.tokenType = 1155
       let name = ''
+      let imageURL = ''
       try {
         let metadata = await axios.get(uri)
         metadata = metadata.data
         name = metadata.name
+        imageURL = metadata.image
       } catch (error) {
         console.log(error)
       }
       savingTk.name = name
+      savingTk.imageURL = imageURL
       savingTk.symbol = 'symbol'
       // save the erc1155 holdings instead here
 
