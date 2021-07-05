@@ -11,8 +11,8 @@ const ERC1155HOLDING = mongoose.model('ERC1155HOLDING')
 const SimplifiedERC1155ABI = require('../constants/simplified1155abi')
 
 const provider = new ethers.providers.JsonRpcProvider(
-  process.env.MAINNET_RPC,
-  parseInt(process.env.MAINNET_CHAINID),
+  process.env.NETWORK_RPC,
+  parseInt(process.env.NETWORK_CHAINID),
 )
 
 const toLowerCase = (val) => {
