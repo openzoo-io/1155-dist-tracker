@@ -144,7 +144,8 @@ const analyzeEvents = async (address, contract) => {
       // when there is a registered array for a particular tokenID
       if (!holdersPerTkID.includes(sender))
         if (sender != validatorAddress) holdersPerTkID.push(sender)
-      if (!holdersPerTkID.includes(receiver)) holdersPerTkID.push(receiver)
+      if (!holdersPerTkID.includes(receiver) && receiver != validatorAddress)
+        holdersPerTkID.push(receiver)
       holders.set(tokenID, holdersPerTkID)
     } else {
       let _holdersPerTkID = []
@@ -172,7 +173,7 @@ const analyzeEvents = async (address, contract) => {
         if (!holdersPerTkID.includes(sender))
           if (sender != validatorAddress)
             holdersPerTkID.push(toLowerCase(sender))
-        if (!holdersPerTkID.includes(receiver))
+        if (!holdersPerTkID.includes(receiver) && receiver != validatorAddress)
           holdersPerTkID.push(toLowerCase(receiver))
         holders.set(tokenID, holdersPerTkID)
       } else {
