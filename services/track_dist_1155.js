@@ -15,6 +15,20 @@ const provider = new ethers.providers.JsonRpcProvider(
   parseInt(process.env.NETWORK_CHAINID),
 )
 
+const loadedContracts = new Map()
+
+const getTokenUri = async (contractAddress, tokenID) => {
+  let sc = loadedContracts.get(contractAddress)
+  if (sc) {
+    let uri = await sc.uri(tokenID)
+    return uri
+  } else {
+    sc = new ethers.Contract(contractAddress, SimplifiedERC1155ABI, provider)
+    loadedContracts.set(contractAddress, sc)
+    let uri = await sc.uri(tokenID)
+    return uri
+  }
+}
 const toLowerCase = (val) => {
   if (val) return val.toLowerCase()
   else return val
@@ -127,10 +141,13 @@ const analyzeEvents = async (address, contract) => {
     stData = parseSingleTrasferData(stData)
     let tokenID = stData[0]
     let supply = stData[1]
-    let tokenURI = 'https"//'
+    let tokenURI = 'https://'
     try {
       tokenURI = parseURIHexToString(uriData)
     } catch (error) {}
+    if (!tokenURI || tokenURI == 'https://') {
+      tokenURI = await getTokenUri(contractAddress, tokenID)
+    }
 
     // when this is a mint evt, log total supply & token uri
     if (sender == validatorAddress) {
