@@ -213,12 +213,12 @@ const analyzeEvents = async (address, contract) => {
     })
     let ownerMap = new Map()
     if (_savedTk) {
-      let owners = _savedTk.owner
-      let ownerAddrs = owners.keys()
-      let _ownerAddr = ownerAddrs.next().value
-      while (_ownerAddr) {
-        if (!holderAddrs.includes(_ownerAddr)) holderAddrs.push(_ownerAddr)
-      }
+      // let owners = _savedTk.owner
+      // let ownerAddrs = owners.keys()
+      // let _ownerAddr = ownerAddrs.next().value
+      // while (_ownerAddr) {
+      //   if (!holderAddrs.includes(_ownerAddr)) holderAddrs.push(_ownerAddr)
+      // }
       let promise = holderAddrs.map(async (holderAddr) => {
         let supply = await getSupplyPerAddress(tkID, holderAddr, contract)
         supply = parseInt(supply.toString())
@@ -321,5 +321,9 @@ const track1155Distribution = async () => {
   }
   await func()
 } //track 1155 dist
+
+// const _track1155Distribution = async () => {
+//   await NFTITEM.deleteMany({ tokenType: 1155 })
+// }
 
 module.exports = track1155Distribution
