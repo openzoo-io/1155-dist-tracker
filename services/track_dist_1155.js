@@ -14,8 +14,27 @@ const provider = new ethers.providers.JsonRpcProvider(
   process.env.NETWORK_RPC,
   parseInt(process.env.NETWORK_CHAINID),
 )
-
 const loadedContracts = new Map()
+const bannedCollections = new Map()
+
+const isBannedCollection = async (contractAddress) => {
+  let isBanned = bannedCollections.get(contractAddress)
+  if (isBanned) return true
+  try {
+    let contract_721 = await ERC1155CONTRACT.findOne({
+      address: contractAddress,
+    })
+    if (contract_721) {
+      bannedCollections.set(contractAddress, true)
+      return true
+    } else {
+      bannedCollections.set(contractAddress, false)
+      return false
+    }
+  } catch (error) {
+    return false
+  }
+}
 
 const getTokenUri = async (contractAddress, tokenID) => {
   let sc = loadedContracts.get(contractAddress)
@@ -286,6 +305,8 @@ const analyzeEvents = async (address, contract) => {
       savingTk.createdAt = new Date(blockTime)
       savingTk.supply = supplies.get(tkID)
       try {
+        let isBanned = await isBannedCollection(address)
+        savingTk.isAppropriate = !isBanned
         await savingTk.save()
       } catch (error) {
         console.log(error)
