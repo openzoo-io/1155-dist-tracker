@@ -107,6 +107,8 @@ const analyzeEvents = async (address, contract) => {
 
   let cbh = await provider.getBlockNumber() //current block height
 
+  console.log('current block height', cbh);
+
   // get all single transfer events
   let ste = await provider.getLogs({
     address: address,
@@ -136,6 +138,8 @@ const analyzeEvents = async (address, contract) => {
       ),
     ],
   })
+
+  console.log('ste', ste.length, 'urie', urie.length, 'bte', bte.length);
 
   //   loop single transfer events first along with uri event
   for (let i = 0; i < ste.length; ++i) {
@@ -308,6 +312,7 @@ const analyzeEvents = async (address, contract) => {
         let isBanned = await isBannedCollection(address)
         savingTk.isAppropriate = !isBanned
         await savingTk.save()
+        console.log('savingTk.save()')
       } catch (error) {
         console.log(error)
       }
@@ -324,6 +329,7 @@ const track1155Distribution = async () => {
       let untrackedSCs = await ERC1155CONTRACT.find({
         address: { $nin: trackedAddresses },
       })
+      console.log('track1155Distribution untrackedSCs', untrackedSCs);
       if (untrackedSCs) {
         let promise = untrackedSCs.map(async (sc) => {
           let address = sc.address
