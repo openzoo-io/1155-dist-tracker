@@ -318,6 +318,7 @@ const analyzeEvents = async (address, contract) => {
       }
 
       tkID = tkIDs.next().value
+      console.log('tkID', tkID)
     }
   }
 }
@@ -329,7 +330,7 @@ const track1155Distribution = async () => {
       let untrackedSCs = await ERC1155CONTRACT.find({
         address: { $nin: trackedAddresses },
       })
-      console.log('track1155Distribution untrackedSCs', untrackedSCs);
+      console.log('track1155Distribution untrackedSCs', untrackedSCs.length);
       if (untrackedSCs) {
         let promise = untrackedSCs.map(async (sc) => {
           let address = sc.address
@@ -339,6 +340,7 @@ const track1155Distribution = async () => {
           trackedSCs.push(contract)
           await analyzeEvents(address, contract)
         })
+        await Promise.all(promise);
       }
     } catch (error) {}
 
